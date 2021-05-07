@@ -10,15 +10,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.restapi.app.twittor.Entity.Usuario;
 import com.restapi.app.twittor.Service.UsuarioService;
-import com.restapi.app.twittor.security.dto.UsuarioMain;
 import com.restapi.app.twittor.security.service.UserDetailsServiceImpl;
 
 /**
@@ -55,18 +52,13 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
                 String emailUsuario = jwtProvider.getNombreUsuarioFromToken(token);
                                 
-                logger.error("aca es Jwt : {}", emailUsuario);
-
-                Usuario usuario = usuarioService.getUserByName(emailUsuario);
                 UserDetails userDetails = userDetailsService.loadUserByUsername(emailUsuario);
-                logger.info(userDetails.toString());
                 
                 UsernamePasswordAuthenticationToken auth =
                         new UsernamePasswordAuthenticationToken(userDetails,
                                 null,null);
                 
                 SecurityContextHolder.getContext().setAuthentication(auth);
-                logger.error("aca chequea passoword y carga AUTH");
             }
         }catch (Exception e){
             logger.error("Fail en el método doFilter " + e.getMessage());

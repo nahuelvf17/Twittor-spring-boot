@@ -1,15 +1,12 @@
 package com.restapi.app.twittor.DAO;
 
 import com.restapi.app.twittor.Entity.Usuario;
-import com.restapi.app.twittor.securityJwt.JwtProvider;
 
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.convert.MongoConverter;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -25,9 +22,6 @@ public class UsuarioDAO implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	private final static Logger logger = LoggerFactory.getLogger(UsuarioDAO.class);
-
-	
 	@Autowired
 	private MongoOperations mongoOperations;
 	
@@ -39,10 +33,10 @@ public class UsuarioDAO implements Serializable {
         return repository.findAll();
     }
 
-    public Usuario getUsuario(String id){
+    public Usuario getUsuario(String id) throws Exception{
         final Usuario usuario = repository.findById(id).orElse(null);
         if(usuario==null) {
-        	throw new RuntimeException();
+        	throw new Exception("Ocurrio un error al intentar buscar el registro, o no existe el usuario");
         }
         usuario.setPassword(null);
         return usuario;
@@ -53,8 +47,6 @@ public class UsuarioDAO implements Serializable {
     }
     
     public Usuario findUsuarioByEmail(String email) {
-    	logger.info("aca viene buscar por email");
-    	logger.info(email);
     	return repository.getUsuarioByEmail(email);
     }
     

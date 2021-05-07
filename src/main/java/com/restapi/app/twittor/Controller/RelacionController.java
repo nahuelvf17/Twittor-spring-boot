@@ -18,11 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.restapi.app.twittor.DTO.DevuelvoTweetsSeguidoresDTO;
 import com.restapi.app.twittor.DTO.UserDTO;
 import com.restapi.app.twittor.Entity.Relacion;
-import com.restapi.app.twittor.Entity.Tweet;
 import com.restapi.app.twittor.Service.RelacionService;
 import com.restapi.app.twittor.Service.UsuarioService;
-import com.restapi.app.twittor.security.AuthenticationFacade;
-import com.restapi.app.twittor.security.Controller.AuthController;
 
 
 @RestController
@@ -34,28 +31,17 @@ public class RelacionController {
 	@Autowired
 	UsuarioService usuarioService;
 	
-	@Autowired
-	AuthenticationFacade authenticationFacade;
 		
 	private final static Logger logger = LoggerFactory.getLogger(RelacionController.class);
 		
 	@PostMapping("/altaRelacion")
     public ResponseEntity<?> altaRelacion(@RequestParam String id){
         
-		if(id.isEmpty()) {
-			return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Debe enviar el parametro ID");
-		}
-		
-		final String userId = usuarioService.getUserIdByName(authenticationFacade.getAuthentication().getName());
-		
-		final Relacion relacion = new Relacion(userId, id);
-        
-		logger.info(relacion.toString());
-		
-		if(!relacionService.createRelation(relacion)) {
-        	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Hubo un erro al intentar grabar la relacion");
+		try {
+			relacionService.createRelation(id);
+		}catch(final Exception e) {
+			
+        	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
         
         return ResponseEntity.status(HttpStatus.CREATED).body("");
@@ -63,24 +49,14 @@ public class RelacionController {
 	
 	@GetMapping("/consultaRelacion")
     public ResponseEntity<?> consultaRelacion(@RequestParam String id){
+		final Relacion findRelation;
 		
-		if(id.isEmpty()) {
-			return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Debe enviar el parametro ID");
+		try {
+			findRelation = relacionService.findRelation(id);	
+		}catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 		}
-		
-		final String userRelatedId = id;
-		final String userId = usuarioService.getUserIdByName(authenticationFacade.getAuthentication().getName());
-		
-		logger.info(userId);
-		logger.info(userRelatedId);
-		final Relacion findRelation = relacionService.findRelation(userId, userRelatedId);
         
-		if(findRelation!=null)
-			logger.info(findRelation.toString());
-		else
-			logger.info("aca findRelation es null");
 		// Response
         Map<String, String> body = new HashMap<>();
 	        
@@ -96,22 +72,14 @@ public class RelacionController {
 	
 	@DeleteMapping("/bajaRelacion")
 	public ResponseEntity<?> bajaRelacion(@RequestParam String id){
+		final Relacion deletedRelation;
+		try {
+			deletedRelation = relacionService.deleteRelation(id);
 
-		if(id.isEmpty()) {
+		}catch(final Exception e) {
 			return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("Debe enviar el parametro ID");
-		}
-		
-		final String userRelatedId = id;
-		final String userId = usuarioService.getUserIdByName(authenticationFacade.getAuthentication().getName());
-		
-		final Relacion deletedRelation = relacionService.deleteRelation(userId, userRelatedId);
-		if(deletedRelation!=null) logger.info(deletedRelation.toString());
-		if(deletedRelation==null) {
-			return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Hubo un problema al eliminar");
+                    .body(e.getMessage());
 		}
 		
         return ResponseEntity.status(HttpStatus.CREATED).body("");
@@ -121,44 +89,27 @@ public class RelacionController {
 	@GetMapping("/leoTweetsSeguidores")
 	public ResponseEntity<?> leoTweetsSeguidores(@RequestParam String pagina){
         
-		final String userId = usuarioService.getUserIdByName(authenticationFacade.getAuthentication().getName());
+		List<DevuelvoTweetsSeguidoresDTO> followersList;
 		
-		if(pagina.isEmpty()) {
+		try {
+			followersList = relacionService.getTweetFollowers(pagina);
+		}catch(Exception e) {
 			return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Debe enviar el parametro PAGINA");
+                    .status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 		}
-			
-		List<DevuelvoTweetsSeguidoresDTO> followersList = relacionService.getTweetFollowers(userId, pagina);
-		
-		logger.info(followersList.toString());
 		
 		return ResponseEntity.status(HttpStatus.CREATED).body(followersList);
 	}
 	
 	@GetMapping("/listaUsuarios")
-	public ResponseEntity<?> listaUsuarios(@RequestParam String tipo, @RequestParam String page, @RequestParam String search){
-		
-		final String userId = usuarioService.getUserIdByName(authenticationFacade.getAuthentication().getName());
-		
-		Integer pageValue;
-		
+	public ResponseEntity<?> listaUsuarios(@RequestParam String tipo, @RequestParam String page, @RequestParam(required=false) String search){
+				
+		final List<UserDTO> results;
 		try {
-			pageValue = Integer.valueOf(page);	
-		}catch(Exception e){
-			return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Debe enviar el parametro PAGINA como un entero");
+			results = relacionService.getAllUser(tipo, page, search);
+		}catch(Exception e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 		}
-		
-		if(pageValue <=0 ) {
-			return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Debe enviar el parametro PAGINA como entero mayor a 0");
-		}
-		
-		final List<UserDTO> results = relacionService.getAllUser(userId, tipo, pageValue, search);
-		
 		
 		return ResponseEntity.status(HttpStatus.CREATED).body(results);
 	}

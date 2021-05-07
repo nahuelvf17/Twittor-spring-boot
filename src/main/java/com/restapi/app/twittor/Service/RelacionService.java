@@ -16,6 +16,8 @@ import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.LookupOperation;
 import org.springframework.data.mongodb.core.aggregation.SortOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 
@@ -24,6 +26,7 @@ import com.restapi.app.twittor.DTO.DevuelvoTweetsSeguidoresDTO;
 import com.restapi.app.twittor.DTO.UserDTO;
 import com.restapi.app.twittor.Entity.Relacion;
 import com.restapi.app.twittor.Entity.Usuario;
+import com.restapi.app.twittor.security.AuthenticationFacade;
 
 @Service
 public class RelacionService {
@@ -37,24 +40,77 @@ public class RelacionService {
 	@Autowired
     private MongoOperations mongoOperation;
 	
-	public boolean createRelation(Relacion relation) {
-    	return relacionDAO.createRelation(relation)!=null;
+	@Autowired
+	AuthenticationFacade authenticationFacade;
+	
+	@Autowired
+	UsuarioService usuarioService; 
+	
+	public boolean createRelation(String userRelatedId) throws Exception {
+    	
+		if(userRelatedId.isEmpty()) {
+			throw new Exception("Debe enviar el parametro ID");
+		}
+		
+		
+		final String userId = usuarioService.getUserIdByName(authenticationFacade.getAuthentication().getName());
+		
+		final Relacion relation = new Relacion(userId, userRelatedId);
+		
+		return relacionDAO.createRelation(relation)!=null;
     }
 	
-	public Relacion findRelation(String userId, String userRelatedId) {
+	public Relacion findRelation(String userRelatedId) throws Exception {
     	
+		if(userRelatedId.isEmpty()) {
+			throw new Exception("Debe enviar el parametro ID");
+		}
+		
+		final String userId = usuarioService.getUserIdByName(authenticationFacade.getAuthentication().getName());
+
+		
 		return relacionDAO.findRelation(userId, userRelatedId);
     }
 	
-	public Relacion deleteRelation(String userId, String userRelatedId) {
-    	
-		return relacionDAO.deleteRelation(userId, userRelatedId);
+	public Relacion findRelation(String userId, String userRelatedId) {
+    			
+		return relacionDAO.findRelation(userId, userRelatedId);
+    }
+	
+	public Relacion deleteRelation(String userRelatedId) throws Exception {	
+		if(userRelatedId.isEmpty()) {
+			throw new Exception("Debe enviar el parametro ID");
+		}
+		
+		final String userId = usuarioService.getUserIdByName(authenticationFacade.getAuthentication().getName());
+
+		final Relacion deletedRelation = relacionDAO.deleteRelation(userId, userRelatedId);
+		
+		if(deletedRelation==null) {
+			throw new Exception("Hubo un problema al eliminar");
+		}
+		
+		return deletedRelation;
     }
 	
 	
-	public List<DevuelvoTweetsSeguidoresDTO> getTweetFollowers(final String userId, final String pagina){
+	public List<DevuelvoTweetsSeguidoresDTO> getTweetFollowers(final String page) throws Exception{
 		
-		Integer skip = (Integer.valueOf(pagina) - 1) * 20;
+		
+		Integer pageInt;
+		
+		try {
+			pageInt = Integer.valueOf(page);	
+		}catch(Exception e){
+			throw new Exception("Debe enviar el parametro PAGINA como un entero");
+		}
+		
+		if(pageInt<=0) throw new Exception("El parametro pagina debe ser mayor a 0");
+		
+		
+		final String userId = usuarioService.getUserIdByName(authenticationFacade.getAuthentication().getName());
+		
+		Integer skip = (pageInt - 1) * 20;
 
 		LookupOperation lookupOperation = LookupOperation.newLookup().
 	            from("tweet").
@@ -66,76 +122,56 @@ public class RelacionService {
 		
 		AggregationOperation unwind =  Aggregation.unwind("tweet");
 		
-		AggregationOperation page = Aggregation.skip(skip);
+		AggregationOperation pageOper = Aggregation.skip(skip);
 		
 		AggregationOperation limit = Aggregation.limit(20);
 
         SortOperation sortOperation = Aggregation.sort(Sort.by(Sort.Direction.DESC, "fecha"));
 		
         
-		Aggregation aggregation = Aggregation.newAggregation(match, lookupOperation, unwind, page, limit, sortOperation);
+		Aggregation aggregation = Aggregation.newAggregation(match, lookupOperation, unwind, pageOper, limit, sortOperation);
 		AggregationResults<DevuelvoTweetsSeguidoresDTO> results = mongoOperation.aggregate(aggregation, "relacion", DevuelvoTweetsSeguidoresDTO.class);		
 		
 		return results.getMappedResults();  
 		
 	}
 	
-	public List<UserDTO> getAllUser(String userId, String tipo, Integer pageValue, String search){
+	public List<UserDTO> getAllUser(String tipo, String page, String search) throws Exception{
+		Integer pageInt;
 		
-		Integer skip = (pageValue - 1) * 20;
+		try {
+			pageInt = Integer.valueOf(page);	
+		}catch(Exception e){
+			throw new Exception("Debe enviar el parametro PAGINA como un entero");
+		}
+		
+		if(pageInt <=0 ) {
+			throw new Exception("Debe enviar el parametro PAGINA como entero mayor a 0");
+		}
+		
+		
+		final String userId = usuarioService.getUserIdByName(authenticationFacade.getAuthentication().getName());
+		
+		Integer skip = (pageInt - 1) * 20;
 		
 		AggregationOperation match = Aggregation.match(Criteria.where("nombre").regex("(?i)" + search, "i"));
 				
-		AggregationOperation page  = Aggregation.skip(skip);
+		AggregationOperation pageOper = Aggregation.skip(skip);
 		
 		AggregationOperation limit = Aggregation.limit(20);		
         
-		Aggregation aggregation = Aggregation.newAggregation(match, page, limit);
+		Aggregation aggregation = Aggregation.newAggregation(match, pageOper, limit);
 		
-		logger.info(aggregation.toString());
-		AggregationResults<Usuario> results = mongoOperation.aggregate(aggregation, "usuarios", Usuario.class);		
+		 List<UserDTO> resultAllUser;
 		
-		final List<Usuario> listUsers =  results.getMappedResults();
-		final List<UserDTO> listUserDto= new ArrayList<>();
-		
-		logger.info("aca llego depsyed del agregation");
-		logger.info(listUsers.toString());
-
-		
-		ModelMapper modelMapper = new ModelMapper();
-		
-		listUsers.forEach(user->{
-			//final Relacion relacion = new Relacion(userId, user.getId());
-			Relacion relacion = findRelation(userId, user.getId());
-			boolean located, include;
-
-			include = false;
-			located = relacion!=null;
-			
-			if( tipo.equals(NEW_TYPE) && !located) {
-				include = true;
-			}
-			
-			if( tipo.equals(FOLLOW_TYPE) && located) {
-				include = true;
-			}
-			
-			if(userId.equals(user.getId())) {
-				include = false;
-			}
-			logger.info("aca llego y tengo datos");
-			logger.info(user.toString());
-			if(include) listUserDto.add(modelMapper.map(user, UserDTO.class));
-		
-		});
-		
-		logger.info("Fin");
-		
-		logger.info(listUserDto.toString());
-		return listUserDto;
+		 try {
+			 resultAllUser = relacionDAO.getAllUser(aggregation, userId, tipo);
+		 }catch(Exception e) {
+			 throw e;
+		 }
+		 
+		 return resultAllUser;
 	}
 	
-	private static String NEW_TYPE = "new";
-	private static String FOLLOW_TYPE = "follow";
-
+	
 }

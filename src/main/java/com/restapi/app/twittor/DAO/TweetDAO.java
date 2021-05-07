@@ -5,10 +5,7 @@ import java.sql.Date;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Collection;
-import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -16,7 +13,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
-import com.restapi.app.twittor.Controller.TweetController;
 import com.restapi.app.twittor.Entity.Tweet;
 
 @Component
@@ -56,8 +52,5 @@ public class TweetDAO implements Serializable {
 	    
 	    return mongoOperations.find(query, Tweet.class);
 	}
-	
-    private final static Logger logger = LoggerFactory.getLogger(TweetDAO.class);
-
 }
 

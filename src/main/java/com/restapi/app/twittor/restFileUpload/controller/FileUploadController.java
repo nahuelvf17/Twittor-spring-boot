@@ -46,22 +46,24 @@ public class FileUploadController {
     @PostMapping(value= {"/subirAvatar"})
     public ResponseEntity<?> uploadAvatar(@RequestParam("avatar") MultipartFile avatar) {
                 
-        if(saveFileUpdateUser(fileStorageProperties.getPathAvatar(), avatar, "AVATAR")) {
-            return ResponseEntity.status(HttpStatus.CREATED).body("");
+    	try {
+    		saveFileUpdateUser(fileStorageProperties.getPathAvatar(), avatar, "AVATAR");
+        }catch(Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Hubo error copiendo la imagen del avatar");	
         }
-   
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Hubo error copiendo la imagen");
-
+        return ResponseEntity.status(HttpStatus.CREATED).body("");
     }
     
     @PostMapping("/subirBanner")
     public ResponseEntity<?> uploadBanner(@RequestParam("banner") MultipartFile banner) {        
-        if(saveFileUpdateUser(fileStorageProperties.getPathBanner(), banner, "BANNER")) {
-            return ResponseEntity.status(HttpStatus.CREATED).body("");
+        try {
+        	saveFileUpdateUser(fileStorageProperties.getPathBanner(), banner, "BANNER");	
+        }catch(Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Hubo error copiendo la imagen del banner");
         }
-   
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Hubo error copiendo la imagen");
-
+        
+        return ResponseEntity.status(HttpStatus.CREATED).body("");
+        
     }
       
     @GetMapping("/obtenerBanner")
@@ -79,10 +81,10 @@ public class FileUploadController {
     		
     		usuario = usuarioService.getUsuario(id);
     		
-    	} catch(RuntimeException e) {
+    	} catch(Exception e) {
     		return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("El usuario no existe");
+                    .body(e.getMessage());
     	}
     	
     	// Load file as Resource
@@ -122,10 +124,10 @@ public class FileUploadController {
     		
     		usuario = usuarioService.getUsuario(id);
     		
-    	} catch(RuntimeException e) {
+    	} catch(Exception e) {
     		return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("El usuario no existe");
+                    .body(e.getMessage());
     	}
     	
     	// Load file as Resource
@@ -151,7 +153,7 @@ public class FileUploadController {
                 .body(resource);
     }
     
-    public boolean saveFileUpdateUser(String pathFile, MultipartFile fileRequest, String origin ) {
+    public boolean saveFileUpdateUser(String pathFile, MultipartFile fileRequest, String origin ) throws Exception {
     	
     	final Authentication authentication = authenticationFacade.getAuthentication();
     	String userId = usuarioService.getUserIdByName(authentication.getName());
@@ -162,8 +164,13 @@ public class FileUploadController {
 
         logger.info(String.format("Archivo es: %s y el nombre nuevo es : %s", fileRequest, fileName));
         
-   
-        final Usuario usuarioUpdate = usuarioService.getUsuario(userId);
+        Usuario usuarioUpdate;
+        try {
+            usuarioUpdate = usuarioService.getUsuario(userId);	
+        }catch(Exception e) {
+        	throw e;
+        }
+        
         if(origin.compareTo("AVATAR")==0) usuarioUpdate.setAvatar(fileName);
         if(origin.compareTo("BANNER")==0) usuarioUpdate.setBanner(fileName);
 
