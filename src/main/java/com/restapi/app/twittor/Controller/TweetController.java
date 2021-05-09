@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.restapi.app.twittor.DTO.TweetListDTO;
 import com.restapi.app.twittor.Entity.Tweet;
 import com.restapi.app.twittor.Service.TweetService;
 import com.restapi.app.twittor.Service.UsuarioService;
@@ -72,7 +73,7 @@ public class TweetController {
 		}
 		
 		
-		Collection<Tweet> tweets = tweetService.leoTweets(usuarioId, pagina);
+		Collection<TweetListDTO> tweets = tweetService.leoTweets(usuarioId, pagina);
 		
 		return ResponseEntity.status(HttpStatus.CREATED).body(tweets);
 	}

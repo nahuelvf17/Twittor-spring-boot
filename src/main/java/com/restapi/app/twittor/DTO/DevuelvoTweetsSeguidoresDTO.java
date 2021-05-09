@@ -18,17 +18,17 @@ public class DevuelvoTweetsSeguidoresDTO implements Serializable {
 	String _id;
 
 	@Field("usuarioid")
-	String usuarioId;
+	String userId;
 	
 	@Field("usuariorelacionid")
-	String usuarioRelacionId;
+	String userRelationId;
 	
 	@Field("tweet")
 	TweetDTO Tweet;
 
 	@Override
 	public String toString() {
-		return "DevuelvoTweetsSeguidoresDTO [id=" + _id + ", usuarioId=" + usuarioId + ", usuarioRelacionId="
-				+ usuarioRelacionId + ", tweet=" + Tweet + "]";
+		return "DevuelvoTweetsSeguidoresDTO [id=" + _id + ", usuarioId=" + userId + ", usuarioRelacionId="
+				+ userRelationId + ", tweet=" + Tweet + "]";
 	}	
 }

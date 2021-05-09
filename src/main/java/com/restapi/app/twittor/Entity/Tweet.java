@@ -5,6 +5,7 @@ import java.util.Date;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -19,7 +20,8 @@ public class Tweet implements Serializable{
 	private static final long serialVersionUID = 7021949247088159250L;
 
 	@Id
-    private String id;
+    @Field("_id")
+	private String id;
 
     private String userid;
     private String mensaje;

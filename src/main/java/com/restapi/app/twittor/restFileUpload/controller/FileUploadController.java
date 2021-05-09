@@ -112,6 +112,7 @@ public class FileUploadController {
     
     @GetMapping(("/obtenerAvatar"))
     public ResponseEntity<?> obtenerAvatar(@RequestParam String id, HttpServletRequest request) {
+    	logger.info("aca1");
     	if(id.length()<1) {
     		return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
@@ -119,12 +120,15 @@ public class FileUploadController {
     	}
     	
     	Usuario usuario;
-    	
+    	logger.info("aca");
+
     	try {
     		
     		usuario = usuarioService.getUsuario(id);
     		
     	} catch(Exception e) {
+        	logger.info("aca3");
+
     		return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body(e.getMessage());
@@ -133,7 +137,8 @@ public class FileUploadController {
     	// Load file as Resource
     	fileStorageService.setValueForLocation(fileStorageProperties.getPathAvatar(), "");
         Resource resource = fileStorageService.loadFileAsResource(usuario.getAvatar());
-        
+    	logger.info("aca4");
+
         // Try to determine file's content type
         String contentType = null;
         try {
@@ -142,10 +147,13 @@ public class FileUploadController {
             logger.info("Could not determine file type.");
         }
 
+    	logger.info("aca5");
+
         // Fallback to the default content type if type could not be determined
         if(contentType == null) {
             contentType = "application/octet-stream";
         }
+    	logger.info("aca6");
 
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(contentType))

@@ -81,7 +81,15 @@ public class JwtProvider {
 	}
 	
 	public Boolean validatePassword(Usuario usuario, String password) {
-		final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();  
+		logger.info("aca es validate password");
+		final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(8);  
 		return encoder.matches(password, usuario.getPassword()); 
+	}
+	
+	public String encoderPassword(String password) {
+		logger.info("aca es encoder");
+
+		final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(8);  
+		return encoder.encode(password); 
 	}
 }

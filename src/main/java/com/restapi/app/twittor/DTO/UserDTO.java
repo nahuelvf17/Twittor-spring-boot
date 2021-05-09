@@ -16,7 +16,7 @@ public class UserDTO implements Serializable{
 	private static final long serialVersionUID = 5102387453777382099L;
 
 	@Field("id")
-	String _id;
+	String id;
     
     String nombre;
     String apellidos;
@@ -24,7 +24,7 @@ public class UserDTO implements Serializable{
 	
 
 	public void setId(String id) {
-		this._id = id;
+		this.id = id;
 	}
 
 	public void setNombre(String nombre) {

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.restapi.app.twittor.DAO.TweetDAO;
+import com.restapi.app.twittor.DTO.TweetListDTO;
 import com.restapi.app.twittor.Entity.Tweet;
 
 @Service
@@ -23,7 +24,7 @@ public class TweetService {
     	return;
     }
 	
-	public Collection<Tweet> leoTweets(String usuarioId, String pagina){
+	public Collection<TweetListDTO> leoTweets(String usuarioId, String pagina){
 		return tweetDAO.findTweets(usuarioId, pagina);
 	}
 }

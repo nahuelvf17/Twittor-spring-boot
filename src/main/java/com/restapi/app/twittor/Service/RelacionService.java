@@ -16,8 +16,6 @@ import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.LookupOperation;
 import org.springframework.data.mongodb.core.aggregation.SortOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 
@@ -25,7 +23,6 @@ import com.restapi.app.twittor.DAO.RelacionDAO;
 import com.restapi.app.twittor.DTO.DevuelvoTweetsSeguidoresDTO;
 import com.restapi.app.twittor.DTO.UserDTO;
 import com.restapi.app.twittor.Entity.Relacion;
-import com.restapi.app.twittor.Entity.Usuario;
 import com.restapi.app.twittor.security.AuthenticationFacade;
 
 @Service
