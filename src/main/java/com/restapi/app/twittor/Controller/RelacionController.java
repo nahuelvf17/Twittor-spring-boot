@@ -21,6 +21,8 @@ import com.restapi.app.twittor.Entity.Relacion;
 import com.restapi.app.twittor.Service.RelacionService;
 import com.restapi.app.twittor.Service.UsuarioService;
 
+import io.swagger.annotations.ApiOperation;
+
 
 @RestController
 public class RelacionController {
@@ -33,7 +35,8 @@ public class RelacionController {
 	
 		
 	private final static Logger logger = LoggerFactory.getLogger(RelacionController.class);
-		
+
+	@ApiOperation(value = "Create", notes = "Create new relation, by user id parameter.")
 	@PostMapping("/altaRelacion")
     public ResponseEntity<?> altaRelacion(@RequestParam String id){
         
@@ -47,6 +50,8 @@ public class RelacionController {
         return ResponseEntity.status(HttpStatus.CREATED).body("");
     }
 	
+	
+	@ApiOperation(value = "Get relation", notes = "Get relacion by user id parameter.")
 	@GetMapping("/consultaRelacion")
     public ResponseEntity<?> consultaRelacion(@RequestParam String id){
 		final Relacion findRelation;
@@ -58,18 +63,19 @@ public class RelacionController {
 		}
         
 		// Response
-        Map<String, String> body = new HashMap<>();
+        Map<String, Boolean> body = new HashMap<>();
 	        
 		if(findRelation==null) {
-			body.put("status", "false");
+			body.put("status", false);
 		}
 		else {
-            body.put("status", "true");
+            body.put("status", true);
         }
         
         return ResponseEntity.status(HttpStatus.CREATED).body(body);
     }
 	
+	@ApiOperation(value = "Delete", notes = "Delte relation.")
 	@DeleteMapping("/bajaRelacion")
 	public ResponseEntity<?> bajaRelacion(@RequestParam String id){
 		final Relacion deletedRelation;
@@ -86,6 +92,7 @@ public class RelacionController {
 
 	}
 	
+	@ApiOperation(value = "Gets all values", notes = "Gets all tweets, paginated.")
 	@GetMapping("/leoTweetsSeguidores")
 	public ResponseEntity<?> leoTweetsSeguidores(@RequestParam String pagina){
         
@@ -101,6 +108,7 @@ public class RelacionController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(followersList);
 	}
 	
+	@ApiOperation(value = "Gets all values", notes = "Gets all values, optional filtered by name, and paginated.")
 	@GetMapping("/listaUsuarios")
 	public ResponseEntity<?> listaUsuarios(@RequestParam String tipo, @RequestParam String page, @RequestParam(required=false) String search){
 				

@@ -1,5 +1,7 @@
 package com.restapi.app.twittor.security;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
+import com.restapi.app.twittor.restFileUpload.controller.FileUploadController;
 import com.restapi.app.twittor.security.service.UserDetailsServiceImpl;
 import com.restapi.app.twittor.securityJwt.JwtEntryPoint;
 import com.restapi.app.twittor.securityJwt.JwtTokenFilter;
@@ -34,6 +37,9 @@ public class MainSecurity extends WebSecurityConfigurerAdapter {
     @Autowired
     JwtEntryPoint jwtEntryPoint;
 
+    private final static Logger logger = LoggerFactory.getLogger(MainSecurity.class);
+
+    
     @Bean
     public JwtTokenFilter jwtTokenFilter(){
         return new JwtTokenFilter();
@@ -41,12 +47,13 @@ public class MainSecurity extends WebSecurityConfigurerAdapter {
 
     @Bean
     public PasswordEncoder passwordEncoder(){
-        return new BCryptPasswordEncoder();
+        return new BCryptPasswordEncoder(8);
     }
 
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+        logger.info("aca es conf¡gure decoder");
+    	auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
     }
 
     @Bean

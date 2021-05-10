@@ -25,6 +25,7 @@ import com.restapi.app.twittor.restFileUpload.property.FileStorageProperties;
 import com.restapi.app.twittor.restFileUpload.service.FileStorageService;
 
 import IAuthenticationFacade.IAuthenticationFacade;
+import io.swagger.annotations.ApiOperation;
 
 @RestController
 public class FileUploadController {
@@ -43,6 +44,7 @@ public class FileUploadController {
 	@Autowired
 	UsuarioService usuarioService;
 	
+	@ApiOperation(value = "Upload avatar", notes = "Upload avatar and update user with url file")
     @PostMapping(value= {"/subirAvatar"})
     public ResponseEntity<?> uploadAvatar(@RequestParam("avatar") MultipartFile avatar) {
                 
@@ -54,6 +56,7 @@ public class FileUploadController {
         return ResponseEntity.status(HttpStatus.CREATED).body("");
     }
     
+	@ApiOperation(value = "Upload banner", notes = "Upload banner and update user with url file")
     @PostMapping("/subirBanner")
     public ResponseEntity<?> uploadBanner(@RequestParam("banner") MultipartFile banner) {        
         try {
@@ -65,8 +68,9 @@ public class FileUploadController {
         return ResponseEntity.status(HttpStatus.CREATED).body("");
         
     }
-      
-    @GetMapping("/obtenerBanner")
+
+	@ApiOperation(value = "Download banner", notes = "Download banner with id user")
+	@GetMapping("/obtenerBanner")
     public ResponseEntity<?> obtenerBanner(@RequestParam String id, HttpServletRequest request) {
         
     	if(id.length()<1) {
@@ -110,9 +114,9 @@ public class FileUploadController {
                 .body(resource);
     }
     
+	@ApiOperation(value = "Download avatar", notes = "Download avatar with id user")
     @GetMapping(("/obtenerAvatar"))
     public ResponseEntity<?> obtenerAvatar(@RequestParam String id, HttpServletRequest request) {
-    	logger.info("aca1");
     	if(id.length()<1) {
     		return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
@@ -120,14 +124,12 @@ public class FileUploadController {
     	}
     	
     	Usuario usuario;
-    	logger.info("aca");
 
     	try {
     		
     		usuario = usuarioService.getUsuario(id);
     		
     	} catch(Exception e) {
-        	logger.info("aca3");
 
     		return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
@@ -137,7 +139,6 @@ public class FileUploadController {
     	// Load file as Resource
     	fileStorageService.setValueForLocation(fileStorageProperties.getPathAvatar(), "");
         Resource resource = fileStorageService.loadFileAsResource(usuario.getAvatar());
-    	logger.info("aca4");
 
         // Try to determine file's content type
         String contentType = null;
@@ -147,13 +148,10 @@ public class FileUploadController {
             logger.info("Could not determine file type.");
         }
 
-    	logger.info("aca5");
-
         // Fallback to the default content type if type could not be determined
         if(contentType == null) {
             contentType = "application/octet-stream";
         }
-    	logger.info("aca6");
 
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(contentType))
@@ -169,8 +167,6 @@ public class FileUploadController {
         fileStorageService.setValueForLocation(pathFile, userId);
 
         String fileName = fileStorageService.storeFile(fileRequest);
-
-        logger.info(String.format("Archivo es: %s y el nombre nuevo es : %s", fileRequest, fileName));
         
         Usuario usuarioUpdate;
         try {

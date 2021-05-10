@@ -21,6 +21,7 @@ import com.restapi.app.twittor.Service.TweetService;
 import com.restapi.app.twittor.Service.UsuarioService;
 
 import IAuthenticationFacade.IAuthenticationFacade;
+import io.swagger.annotations.ApiOperation;
 
 @RestController
 public class TweetController {
@@ -34,6 +35,7 @@ public class TweetController {
 	@Autowired
 	UsuarioService usuarioService;
 	
+	@ApiOperation(value = "Save Tweet", notes = "Save tweet.")
 	@PostMapping("/tweet")
     public ResponseEntity<?> graboTweet(@RequestBody Tweet tweet){
         
@@ -45,6 +47,7 @@ public class TweetController {
         return ResponseEntity.status(HttpStatus.CREATED).body("");
 	}
 	
+	@ApiOperation(value = "Delete Tweet", notes = "Delete tweet by tweet id.")
 	@DeleteMapping("/eliminarTweet")
 	public ResponseEntity<?> eliminarTweet(@RequestParam("id") String tweetId){
 		logger.info(String.format("Prueba id param: %s", tweetId));
@@ -62,6 +65,7 @@ public class TweetController {
 		return ResponseEntity.status(HttpStatus.CREATED).body("");
 	}
 	
+	@ApiOperation(value = "list all Tweet", notes = "Get tweets by user id, paginated.")
 	@GetMapping("/leoTweets")
 	public ResponseEntity<?> leoTweets(@RequestParam("id") String usuarioId, @RequestParam("pagina") String pagina){
 		if(usuarioId.isEmpty()) {

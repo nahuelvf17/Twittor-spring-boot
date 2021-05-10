@@ -20,6 +20,8 @@ import com.restapi.app.twittor.security.dto.JwtDto;
 import com.restapi.app.twittor.security.dto.LoginUsuario;
 import com.restapi.app.twittor.securityJwt.JwtProvider;
 
+import io.swagger.annotations.ApiOperation;
+
 @RestController
 @RequestMapping("/auth")
 @CrossOrigin
@@ -38,6 +40,7 @@ public class AuthController {
 	JwtProvider jwtProvider;
 
 	// Espera un json y lo convierte a tipo clase NuevoUsuario
+	@ApiOperation(value = "Registro", notes = "Create new user.")
 	@PostMapping("/registro")
 	public ResponseEntity<?> nuevoUsuario(@RequestBody Usuario usuario) {
 		
@@ -54,6 +57,7 @@ public class AuthController {
 
 	}
 	
+	@ApiOperation(value = "Login", notes = "Login User.")
 	@PostMapping("/login")
     public ResponseEntity<JwtDto> login( @RequestBody LoginUsuario loginData){
 

@@ -3,6 +3,7 @@ package com.restapi.app.twittor.Controller;
 import com.restapi.app.twittor.Entity.Usuario;
 import com.restapi.app.twittor.Service.UsuarioService;
 import IAuthenticationFacade.IAuthenticationFacade;
+import io.swagger.annotations.ApiOperation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,12 +30,13 @@ public class UsuarioController {
 
     private final static Logger logger = LoggerFactory.getLogger(UsuarioController.class);
 
-    
+	@ApiOperation(value = "Gets all values", notes = "Gets all values")
     @GetMapping("/users")
     public Collection<Usuario> getUsers(){
         return usuarioService.getUsuarios();
     }
 
+	@ApiOperation(value = "Get profile", notes = "Gets all values by user by.")
     @GetMapping(value= {"/verperfil"})
     public ResponseEntity<?>  verPerfil(@RequestParam String id) {
     	final Usuario usuario;
@@ -50,7 +52,8 @@ public class UsuarioController {
     	return ResponseEntity.status(HttpStatus.CREATED).body(usuario);
 
     }
-    
+
+	@ApiOperation(value = "Register", notes = "Register new user.")
     @PostMapping(value= {"/registro"})
     public ResponseEntity<?> registro(@RequestBody Usuario usuario) {
     	
@@ -63,6 +66,7 @@ public class UsuarioController {
     	return ResponseEntity.status(HttpStatus.CREATED).body("");
     }
     
+	@ApiOperation(value = "Update", notes = "Update user data.")
     @PutMapping(value= {"/modificarPerfil"})
     public ResponseEntity<?> modificarPerfil(@RequestBody Usuario usuarioUpdate){
     	final Authentication authentication = authenticationFacade.getAuthentication();

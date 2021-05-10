@@ -49,10 +49,6 @@ public class UsuarioDAO implements Serializable {
 	}
 
 	public Usuario createUsuario(Usuario usuario) {
-		logger.info(usuario.toString());
-		String bcryptPassword = jwtProvider.encoderPassword(usuario.getPassword());
-		
-		usuario.setPassword(bcryptPassword);
 		return repository.save(usuario);
 	}
 
