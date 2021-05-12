@@ -47,7 +47,7 @@ public class RelacionController {
         	return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
         
-        return ResponseEntity.status(HttpStatus.CREATED).body("");
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 	
 	
@@ -88,7 +88,7 @@ public class RelacionController {
                     .body(e.getMessage());
 		}
 		
-        return ResponseEntity.status(HttpStatus.CREATED).body("");
+        return ResponseEntity.status(HttpStatus.CREATED).build();
 
 	}
 	

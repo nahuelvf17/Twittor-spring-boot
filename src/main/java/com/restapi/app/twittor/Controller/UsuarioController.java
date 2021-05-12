@@ -63,7 +63,7 @@ public class UsuarioController {
     		ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     	}
     	
-    	return ResponseEntity.status(HttpStatus.CREATED).body("");
+    	return ResponseEntity.status(HttpStatus.CREATED).build();
     }
     
 	@ApiOperation(value = "Update", notes = "Update user data.")
@@ -75,7 +75,7 @@ public class UsuarioController {
     	boolean updateOk = usuarioService.ModificoRegistro(usuarioUpdate, usuarioForUpdate.getId());
     	
     	if(updateOk) {
-        	return ResponseEntity.status(HttpStatus.CREATED).body("");
+        	return ResponseEntity.status(HttpStatus.CREATED).build();
     	}else {
         	return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error al actualizar el perfil");
     	}

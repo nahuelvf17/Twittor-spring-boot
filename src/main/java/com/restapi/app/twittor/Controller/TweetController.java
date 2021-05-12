@@ -44,7 +44,7 @@ public class TweetController {
 		
 		final Tweet tweetCreated = tweetService.graboTweet(usuarioId, tweet);
         
-        return ResponseEntity.status(HttpStatus.CREATED).body("");
+        return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 	
 	@ApiOperation(value = "Delete Tweet", notes = "Delete tweet by tweet id.")
@@ -62,7 +62,7 @@ public class TweetController {
 		}catch (Exception e){
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Ocurrio un errorr al borrar el tweet");
 		}
-		return ResponseEntity.status(HttpStatus.CREATED).body("");
+		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 	
 	@ApiOperation(value = "list all Tweet", notes = "Get tweets by user id, paginated.")
